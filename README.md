@@ -1,6 +1,6 @@
-# galaxies
+# Galaxies!
 
-FIXME: description
+Galaxies! is a remake of the popular Stars! game written entirely in Clojure.  I'm hoping to add some interesting new features to create a fresh spin on a classic game. 
 
 ## Installation
 
