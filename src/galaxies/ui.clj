@@ -1,6 +1,6 @@
-(ns src.galaxies.ui
+(ns galaxies.ui
   (:use [seesaw core mig color graphics])
-  (:require [src.galaxies.planets :as planets]))
+  (:require [galaxies.planets :as planets]))
 
 
 ;===========================================================================

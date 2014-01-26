@@ -1,5 +1,6 @@
 ;This file will store the logic for defining, creating, and manipulating planet data structures.
-(ns src.galaxies.planets
+(ns galaxies.planets
+  (:refer-clojure)
   (:use [clojure.string :only [split]])
   (:require [clojure.java.io :as io]))
 
@@ -22,7 +23,15 @@
 
 
 ;===========================================================================
-;Planet methods
+;Utility Functions
+;===========================================================================
+(defn fmap
+  "Maps a function onto all the vals of a map.  A functor for the map coll."
+  [m f]
+  (into {} (for [[k v] m] [k (f v)])))
+
+;===========================================================================
+;Planet Methods
 ;===========================================================================
 (defn- precision-rand [n]
   (let [m (Math/pow 10 n)]
@@ -38,14 +47,14 @@
   {:name name
    :pop 0
    :widgets 0
-   :mines {:Technium 0
-           :Scienine 0}
-   :elements {:Technium 0
-              :Scientine 0}
+   :mines {:Engineering 0
+           :Physics 0}
+   :elements {:Engineering 0
+              :Physics 0}
    :schools {:Engineering 0
              :Physics 0}
-   :workers {:Engineers 0
-             :Physicists 0}
+   :workers {:Engineering 0
+             :Physics 0}
    :xcoord (gen-coord)
    :ycoord (gen-coord)})
 
@@ -54,50 +63,63 @@
     :pop pop
     :widgets widgets))
 
+(defn- planet-id [p]
+  (keyword (:name p)))
+
 (defn- widget-cost [amount]
   (* amount 100))
 
 (defn- element-cost [amount]
   (* amount 1000))
 
+(defn- elem-yield [p field]
+  (let [mine-count (get-in p [:mines field])]
+    (* mine-count 5)))
+
 #_(defn- planet-coords [p]
   (str (:xcoord p) "," (:ycoord p)))
-
-(defn- planet-id [p]
-  (keyword (:name p)))
 
 
 ;===========================================================================
 ;Update Methods
 ;===========================================================================
-(defn- alter-attrib [p delta keys]
+(defn- alter-attrib [p keys delta]
   (update-in p keys + delta))
 
-(defmacro build-in 
-  "Anaphoric macro that captures the 'p' and 'amount' arguments from the calling function.
-Used to build new objects by updating the appropriate attributes in the planet object (charging the source
-and growing the target)."
-  [target source cost-func]
-  `(let [cost# (- (#'~cost-func ~'amount))]
-     (-> ~'p
-       (alter-attrib ~'amount ~target)
-       (alter-attrib cost# ~source))))
+(defn- buildf [target src costf]
+  (fn [p amt]
+    (let [cost (- (costf amt))]
+      (-> p
+        (alter-attrib target amt)
+        (alter-attrib src cost)))))
 
-(defn- build-mines [p amount field]
-  (build-in [:mines field] [:widgets] widget-cost))
+(defn- build-mines [p amt field]
+  (let [build (buildf [:mines field] [:widgets] widget-cost)]
+    (build p amt)))
 
-(defn- build-schools [p amount field]
-  (build-in [:schools field] [:elements field] element-cost))
-
+(defn- build-schools [p amt field]
+  (let [build (buildf [:schools field] [:elements field] element-cost)]
+    (build p amt)))
 
 ;===========================================================================
 ;Simulation Methods
 ;===========================================================================
-(defn- grow-attrib [p rate keys]
+(defn- grow-attrib [p keys rate]
   (update-in p keys * rate))
 
 (defn- grow-pop [p]
-  (grow-attrib p growth-rate [:pop]))
+  (grow-attrib p [:pop] growth-rate))
+
+(defn grow-elem [yieldf [elem amt]]
+  (let [yield (yieldf elem)]
+    [elem (+ amt yield)]))
+
+(defn grow-elems [p]
+  (let [yieldf (partial elem-yield p)
+        growf (partial grow-elem yieldf)
+        new-elems (into {} (map growf (:elements p)))]
+    (assoc-in p [:elements] new-elems)))
+
 
 ;===========================================================================
 ;API Methods
