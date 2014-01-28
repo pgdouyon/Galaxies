@@ -1,6 +1,6 @@
 (ns galaxies.ui
   (:use [seesaw core mig color graphics])
-  (:require [galaxies.planets :as planets]))
+  (:require [galaxies [planets :as planets] [key-controls :as kc]]))
 
 
 ;===========================================================================
@@ -24,6 +24,11 @@
 
 
 ;===========================================================================
+;Dialogs
+;===========================================================================
+(defn planet-search "doc-string" []
+  ())
+;===========================================================================
 ;UI panels
 ;===========================================================================
 (def ^:private galaxy-map (canvas :id :galaxy-map
@@ -43,3 +48,7 @@
                      :content main-panel
                      :minimum-size [800 :by 600]
                      ))
+
+(defn init []
+  (-> gui-main pack! show!)
+  (kc/planet-map-keymap gui-main))

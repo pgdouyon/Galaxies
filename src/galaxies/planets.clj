@@ -124,14 +124,15 @@
 ;===========================================================================
 ;API Methods
 ;===========================================================================
-(defn simulate-year []
-  (swap! planet-map (partial map grow-pop)))
+(defn simulate-year! []
+  (let [sim (comp grow-elems grow-pop)]
+      (swap! planet-map (partial map sim))))
 
 
 ;===========================================================================
 ;Initialization
 ;===========================================================================
-(defn- planet-names!
+(defn- planet-names
   "Returns, as a vector, a random permutation of the names in the planet_names.txt file.
 A random number of names is returned varying from [min-planets, min-planets + variance-num-planets]"
   []
@@ -146,7 +147,7 @@ A random number of names is returned varying from [min-planets, min-planets + va
           (map (juxt planet-id identity) planets))))
 
 (defn init! []
-  (let [names (planet-names!)
+  (let [names (planet-names)
         planets (new-planet-map names)]
     (update-planets! planets)))
 
