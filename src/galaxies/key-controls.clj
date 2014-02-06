@@ -1,6 +1,7 @@
-(ns galaxies.key-controls
+(ns galaxies.key_controls
   (:use seesaw.keymap)
-  (:require [galaxies [planets :as planets] [ui :as ui]]))
+  (:require [galaxies [planets :as planets]]))
+;(:require [galaxies [planets :as planets] [ui :as ui]])
 
 (defn- simulate-year [e]
   (planets/simulate-year!))

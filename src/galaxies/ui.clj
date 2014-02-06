@@ -1,6 +1,6 @@
 (ns galaxies.ui
   (:use [seesaw core mig color graphics])
-  (:require [galaxies [planets :as planets] [key-controls :as kc]]))
+  (:require [galaxies [planets :as planets] [key_controls :as kc]]))
 
 
 ;===========================================================================

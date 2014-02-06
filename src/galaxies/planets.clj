@@ -45,10 +45,10 @@
   "Given a name, returns a new planet."
   [name]
   {:name name
-   :pop 0
-   :widgets 0
-   :mines {:Engineering 0
-           :Physics 0}
+   :pop (rand-int 500)
+   :widgets (rand-int 100)
+   :mines {:Engineering (rand-int 5)
+           :Physics (rand-int 5)}
    :elements {:Engineering 0
               :Physics 0}
    :schools {:Engineering 0
@@ -104,11 +104,8 @@
 ;===========================================================================
 ;Simulation Methods
 ;===========================================================================
-(defn- grow-attrib [p keys rate]
-  (update-in p keys * rate))
-
 (defn- grow-pop [p]
-  (grow-attrib p [:pop] growth-rate))
+  (update-in p [:pop] #(Math/round (* growth-rate %))))
 
 (defn grow-elem [yieldf [elem amt]]
   (let [yield (yieldf elem)]
@@ -126,7 +123,7 @@
 ;===========================================================================
 (defn simulate-year! []
   (let [sim (comp grow-elems grow-pop)]
-      (swap! planet-map (partial map sim))))
+      (swap! planet-map fmap sim)))
 
 
 ;===========================================================================
@@ -147,7 +144,7 @@ A random number of names is returned varying from [min-planets, min-planets + va
           (map (juxt planet-id identity) planets))))
 
 (defn init! []
-  (let [names (planet-names)
+  (let [names (take 3 (planet-names))
         planets (new-planet-map names)]
     (update-planets! planets)))
 
