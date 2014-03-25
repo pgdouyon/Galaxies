@@ -10,23 +10,19 @@
   (planets/simulate-year!)
   (print-planets))
 
-(defn get-input-cmd []
-  (let [input (clojure.string/lower-case (read-line))]
-    (condp = input
-      "s" (simulate-year)
-      "p" (print-planets)
-      "q" true
-      (println "Unknown command, please try again:"))))
+(defn parse-cmd [cmd]
+  (condp = cmd
+    "s" (simulate-year)
+    "p" (print-planets)
+    "q" true
+    (println "Unknown command, please try again:")))
 
 (defn main-test []
   (planets/init!)
-  (while (not (get-input-cmd))))
-
-
-
-
-
-
+  (loop []
+    (let [cmd (clojure.string/lower-case (read-line))]
+      (when-not (parse-cmd cmd)
+        (recur)))))
 
 
 (defn -main
